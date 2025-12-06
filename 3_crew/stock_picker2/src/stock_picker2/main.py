@@ -1,10 +1,17 @@
 #!/usr/bin/env python
+
+import os
+os.environ["CREWAI_TRACE_ENABLED"] = "false"
+os.environ["CREWAI_TELEMETRY_DISABLED"] = "true"
+
+
 import sys
 import warnings
 
 from datetime import datetime
 
 from stock_picker2.crew import StockPicker2
+
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
@@ -18,7 +25,7 @@ def run():
     Run the crew.
     """
     inputs = {
-        'sector': 'AI companies',
+        'sector': 'Retails companies',
     }
     result = StockPicker2().crew().kickoff(inputs=inputs)
     print("\n\n=== FINAL DECISION===\n\n")

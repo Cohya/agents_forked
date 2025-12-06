@@ -5,12 +5,12 @@ from typing import List
 from pydantic import BaseModel, Field
 from crewai_tools import SerperDevTool
 from .tools.push_tool import PushNotificationTool
-
 ## Memory integration 
 from crewai.memory import LongTermMemory, ShortTermMemory, EntityMemory 
 from crewai.memory.storage.rag_storage import RAGStorage
 from crewai.memory.storage.ltm_sqlite_storage import LTMSQLiteStorage
-import os 
+import os
+from pathlib import Path 
 ## Example 
 class TrendingCompany(BaseModel):
     """ A company that is in the news and attracting attention """
@@ -79,57 +79,73 @@ class StockPicker2():
     def crew(self) -> Crew:
         """Define the StockPicker2 crew with its agents and tasks"""
 
+        # Get the project root directory (where memory folder is located)
+        # crew.py is at: stock_picker2/src/stock_picker2/crew.py
+        # project root is at: stock_picker2/
+        project_root = Path(__file__).parent.parent.parent
+        # memory_dir = project_root / "memory"
+        # memory_dir.mkdir(exist_ok=True)
+        memory_dir = project_root / "memory"
+
+        if memory_dir.exists():
+    # delete old content (careful)
+            for p in memory_dir.iterdir():
+                if p.is_file(): p.unlink()
+                else: import shutil; shutil.rmtree(p)
+
+
+        os.environ["CREWAI_STORAGE_DIR"] = str(memory_dir.absolute())
+
         if "OPENAI_API_KEY" in os.environ:
             os.environ.setdefault("CHROMA_OPENAI_API_KEY", os.environ["OPENAI_API_KEY"])
-        os.environ["CREWAI_STORAGE_DIR"] = os.path.abspath("./memory")
+        
 
         manager = Agent(config=self.agents_config['manager'],
                         allow_delegation=True) # Telling crew that we can delegate tasks to other agents
         
-        short_term_memory = ShortTermMemory(
-                        storage = RAGStorage(
-                                embedder_config={
-                                    "provider": "openai",
-                                    "config": {
-                                        "model_name": 'text-embedding-3-small'
-                                    }
-                                },
-                                type="short_term",
-                                path="./memory/"
-                            )
-                        )
+        # short_term_memory = ShortTermMemory(
+        #                 storage = RAGStorage(
+        #                         embedder_config={
+        #                             "provider": "openai",
+        #                             "config": {
+        #                                 "model_name": 'text-embedding-3-small'
+        #                             }
+        #                         },
+        #                         type="short_term",
+        #                         path=str(memory_dir.absolute())
+        #                     )
+        #                 )
 
-        long_term_memory = LongTermMemory(
-            storage=LTMSQLiteStorage(
-                db_path="./memory/long_term_memory_storage.db"
-            )
-        )
+        # long_term_memory = LongTermMemory(
+        #     storage=LTMSQLiteStorage(
+        #         db_path=str(memory_dir / "long_term_memory_storage.db")
+        #     )
+        # )
 
-        entity_memory = EntityMemory(
-                        storage=RAGStorage(
-                            embedder_config={
-                                "provider": "openai",
-                                "config": {
-                                    "model_name": 'text-embedding-3-small'
-                                }
-                            },
-                            type="short_term",
-                            path="./memory/"
-                        )
-                    )
+        # entity_memory = EntityMemory(
+        #                 storage=RAGStorage(
+        #                     embedder_config={
+        #                         "provider": "openai",
+        #                         "config": {
+        #                             "model_name": 'text-embedding-3-small'
+        #                         }
+        #                     },
+        #                     type="short_term",
+        #                     path=str(memory_dir.absolute())
+        #                 )
+        #             )
 
         return Crew(agents = self.agents,
                     tasks = self.tasks,
                     process=Process.hierarchical,
                     verbose=True,
                     manager_agent=manager, 
-            #         memory = True, 
+                    # long_term_memory=long_term_memory,
+                    # short_term_memory=short_term_memory,
+                    memory = False, # if this is false the agents cannot use memory, memory in window is problematic and ebenmore in uv env 
+                    # entity_memory=entity_memory
             #               embedder={
             # "provider": "openai",
             # "config": {"model": "text-embedding-3-small"}
             #             }
         )
-                    # long_term_memory=long_term_memory,
-                    # short_term_memory=short_term_memory,
-                    # entity_memory=entity_memory)
-    @TODO(Yaniv):debug the issue when we use memory 
