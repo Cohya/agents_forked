@@ -49,3 +49,45 @@ test_task:
   context:
     - code_task
   output_file: output/test_{module_name}
+
+
+note_taking_task:
+  description: >
+    Take the user's requirements and extract key information:
+    - Key objectives
+    - Constraints
+    - Open questions
+    - Important assumptions
+    Present the extracted information in a clear, structured markdown format.
+    Here are the requirements: {requirements}
+  expected_output: >
+    A structured markdown with sections: Objectives, Constraints, Open Questions, Assumptions.
+  agent: secretary_note_taker
+  output_file: output/note.md
+
+refined_note_taking_task:
+  description: >
+    Based on the user's feedback, refine and update the notes. 
+    The user's feedback is: {user_feedback}
+    Carefully incorporate the feedback into the notes.
+    Update the structured notes with the following sections: Objectives, Constraints, Open Questions, Assumptions.
+  expected_output: >
+    Refined structured markdown with sections: Objectives, Constraints, Open Questions, Assumptions.
+    The notes should incorporate the user's feedback.
+  agent: secretary_note_taker
+  context:
+    - note_taking_task
+  output_file: output/refined_note.md
+
+executer_task:
+  description: >
+    Using the notes from the secretary, create a Gradio UI that implements the requirements.
+    The notes contain the structured requirements with Objectives, Constraints, Open Questions, and Assumptions.
+    Here are the notes: {refined_notes}
+    Create a simple, functional Gradio interface based on these requirements.
+  expected_output: >
+    A gradio UI in module app.py that implements the requirements from the notes.
+    IMPORTANT: Output ONLY the raw Python code without any markdown formatting, code block delimiters, or backticks.
+    The output should be valid Python code that can be directly saved to a file and executed.
+  agent: frontend_engineer
+  output_file: output/app.py

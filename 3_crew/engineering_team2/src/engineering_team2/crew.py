@@ -49,6 +49,13 @@ class EngineeringTeam2():
             max_retries=5,
         )
     
+    @agent
+    def secretary_note_taker(self) -> Agent:
+        return Agent(
+            config=self.agents_config['secretary_note_taker'],
+            verbose=True,
+        )
+
 
     @task
     def design_task(self) -> Task:
@@ -74,6 +81,17 @@ class EngineeringTeam2():
             config=self.tasks_config['test_task'],
         )
     
+    @task 
+    def note_taking_task(self) -> Task:
+        return Task(config = self.tasks_config['note_taking_task'])
+
+    @task
+    def refined_note_taking_task(self) -> Task:
+        return Task(config = self.tasks_config['refined_note_taking_task'])
+
+    @task
+    def executer_task(self) -> Task:
+        return Task(config = self.tasks_config['executer_task'])
 
     @crew
     def crew(self) -> Crew:
