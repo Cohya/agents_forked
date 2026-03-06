@@ -15,7 +15,7 @@ async def process_message(sidekick, message, success_criteria, history):
 
 async def reset():
     new_sidekick = Sidekick()
-    await new_sidekick.setup()
+    await new_sidekick.setup() #<- here we build the graph 
     return "", "", None, new_sidekick
 
 
@@ -30,7 +30,7 @@ def free_resources(sidekick):
 
 with gr.Blocks(title="Sidekick", theme=gr.themes.Default(primary_hue="emerald")) as ui:
     gr.Markdown("## Sidekick Personal Co-Worker")
-    sidekick = gr.State(delete_callback=free_resources)
+    sidekick = gr.State(delete_callback=free_resources) # <- state 
 
     with gr.Row():
         chatbot = gr.Chatbot(label="Sidekick", height=300, type="messages")
