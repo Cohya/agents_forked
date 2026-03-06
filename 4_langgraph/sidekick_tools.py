@@ -32,7 +32,7 @@ def push(text: str):
 
 
 def get_file_tools():
-    toolkit = FileManagementToolkit(root_dir="sandbox")
+    toolkit = FileManagementToolkit(root_dir="sandbox") # force it to use onlt this folder named sandox 
     return toolkit.get_tools()
 
 
@@ -49,7 +49,7 @@ async def other_tools():
     wikipedia = WikipediaAPIWrapper()
     wiki_tool = WikipediaQueryRun(api_wrapper=wikipedia)
 
-    python_repl = PythonREPLTool()
+    python_repl = PythonREPLTool() # if you want to avoid llm to run python code disable it 
     
     return file_tools + [push_tool, tool_search, python_repl,  wiki_tool]
 

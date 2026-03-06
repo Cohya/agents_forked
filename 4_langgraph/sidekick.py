@@ -45,6 +45,7 @@ class Sidekick:
         self.browser = None
         self.playwright = None
 
+    # Thisis the 5 steps to build the graph 
     async def setup(self):
         self.tools, self.browser, self.playwright = await playwright_tools()
         self.tools += await other_tools()
