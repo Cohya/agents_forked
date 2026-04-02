@@ -28,6 +28,7 @@ class Agent(RoutedAgent):
 
     def __init__(self, name) -> None:
         super().__init__(name)
+        # temperature controls how creative vs. deterministic the model's responses are. Higher temperature means more creative.
         model_client = OpenAIChatCompletionClient(model="gpt-4o-mini", temperature=0.7)
         self._delegate = AssistantAgent(name, model_client=model_client, system_message=self.system_message)
 
